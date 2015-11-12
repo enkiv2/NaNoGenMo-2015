@@ -144,12 +144,13 @@ def rankPathByGoal(state, goal, ttl=0):
 	return ranking
 def rankPathByGoalPool(state):
 	compositeProb={}
-	for item in world[state]:
-		compositeProb[item]=0
-		for goal in goalPool:
-			gr=rankPathByGoal(item, goal)*goalPool[goal]
-			#printmsg("GoalPool rank for path "+state+" to goal "+goal+" is ",gr)
-			compositeProb[item]+=gr
+	if(state in world):
+		for item in world[state]:
+			compositeProb[item]=0
+			for goal in goalPool:
+				gr=rankPathByGoal(item, goal)*goalPool[goal]
+				#printmsg("GoalPool rank for path "+state+" to goal "+goal+" is ",gr)
+				compositeProb[item]+=gr
 	return compositeProb
 
 def chooseGoal(state):
@@ -181,7 +182,7 @@ def scenes(state):
 				state=stateStack.pop()
 			else:
 				oldState=state
-	printmsg("THE END")
+	printmsg("THE END\n\n")
 
 def composeComplicationList():
 	global complicationList
