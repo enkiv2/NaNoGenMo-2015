@@ -12,9 +12,9 @@ complicationWeight=0.7
 
 world={}
 world["go about it the obvious way"]={"get a museum uniform":{"probability":0.5, "complications":{"get a smaller gun": { "probability":0.9 }}}}
-world["go_to_gun_store"]={"get a smaller gun":{"probability":0.7, "complications":{"find my stolen wallet":{ "probability":0.2}}}}
+world["go_to_gun_store"]={"get a smaller gun":{"probability":0.7, "complications":{"find my stolen wallet":{ "probability":0.2}}, "descr":["The gun store was a tiny brick building by the side of the highway, in the bad part of town. "], "success_descr":["The owner glared at me, and then at my ID, and then back at me. Then he grunted, accepted my cash, and handed me the new gun. "], "failure_descr":["After banging on the locked door for ten minutes, I noticed a tiny sign at the lower left hand corner of the window embedded in the door. It had hours. It turns out, this store is closed on Tuesdays. "]}}
 world["get a smaller gun"]={}
-world["get a museum uniform"]={"pass as a museum employee":{"probability":0.3, "complications":{"heal my leg wound":{ "probability":0.2}, "escape the museum":{ "probability": 0.7} } } }
+world["get a museum uniform"]={"pass as a museum employee":{"probability":0.3, "complications":{"heal my leg wound":{ "probability":0.2}, "escape the museum":{ "probability": 0.7} } }, "descr":["The costume shop was tucked into a strip mall down town, between a laundromat and a chinese take-out place. It smelled like soap. "], "success_descr":["There was a perfect museum employee uniform sitting on the rack to the left of the entrance. "], "failure_descr":["After looking through the racks several times, I finally decided to ask the cashier -- a wrinkled but plump old woman with a puff of curly white hair -- if she carried museum employee uniforms. She shook her head, and I left, dejected. "]}
 world["pass as a museum employee"]={"steal them jewels":{"probability":0.7, "complications":{"heal my leg wound":{ "probability":0.3}, "heal my arm wound":{ "probability":0.3}, "heal my chest wound":{ "probability":0.3}}}, "go to the hospital":{"probability":0.9}}
 world["go to the hospital"]={"heal my leg wound":{"probability":0.9}, "heal my arm wound":{"probability":0.9}, "heal my chest wound":{"probability":0.7}, "escape the museum":{"probability":0.7}}
 world["heal my leg wound"]={"go to the hospital":{"probability":1}, "get a museum uniform":{"probability":1}, "get a smaller gun":{"probability":1}}
@@ -59,14 +59,24 @@ def scene(state, goal):
 					printmsg("I also have to "+item+". ")
 			#printmsg("State: "+state)
 			printmsg("Right now, I'm trying to "+state+". ")
+			if("descr" in world[state][goal]):
+				printmsg(random.choice(world[state][goal]["descr"]))
 			res=biasedFlip((world[state][goal]["probability"]+successWeight)/2)
 			if(res):
 				#printmsg("Result: success")
+				if("success_descr" in world[state][goal]):
+					printmsg(random.choice(world[state][goal]["success_descr"]))
+				elif("success_descr" in world[goal]):
+					printmsg(random.choice(world[goal]["success_descr"]))
 				printmsg("\n\nI totally succeeded in my attempt to "+goal+" by trying to "+state+". Yay! ")
 				if(goal in goalPool):
 					printmsg("Now I no longer need to "+goal+". ")
 					goalPool.pop(goal)
 			else:
+				if("failure_descr" in world[state][goal]):
+					printmsg(random.choice(world[state][goal]["failure_descr"]))
+				elif("failure_descr" in world[goal]):
+					printmsg(random.choice(world[goal]["failure_descr"]))
 				printmsg("\n\nI failed to "+goal+" while trying to "+state+". Bummer. ")
 				#printmsg("Result: failure")
 			comp=[]
@@ -100,6 +110,8 @@ def scene(state, goal):
 def rankPathByGoal(state, goal, ttl=0):
 	if(state in complicationList and (not (state in goalPool))):
 		return 0
+	if (state in ["descr", "success_descr", "failure_descr"]):
+		return 0
 	#printmsg("Examining ranking of "+state+" -> "+goal)
 	printmsg("So, I thought, what if I tried to "+goal+" by trying to "+state+"... ")
 	ranking=0
@@ -114,7 +126,10 @@ def rankPathByGoal(state, goal, ttl=0):
 				printmsg("I already figured that if I tried to "+goal+" by trying to "+state+" I'd only have about a "+str(int(cachedRankings[state][goal]*10))+" in 10 chance of succeeding. ")
 			return cachedRankings[state][goal]
 	if (goal in world[state]):
-		ranking=world[state][goal]["probability"]
+		if("probability" in world[state][goal]):
+			ranking=world[state][goal]["probability"]
+		else:
+			return 0
 	if(ttl>MAX): 
 		#printmsg("giving up iterating more than "+str(MAX)+" moves ahead")
 		printmsg("Geez, this is complicated. I can't think more than "+str(MAX)+" moves ahead!\n\n")
@@ -123,14 +138,15 @@ def rankPathByGoal(state, goal, ttl=0):
 		found=False
 		for item in world[state]:
 			if(item!=goal and item!=state):
-				rpg=rankPathByGoal(item, goal, ttl+1)*world[state][item]["probability"]
-				ranking+=rpg
-				if(int(rpg*10)>0):
-					if(found):
-						printmsg("On the other hand, if I try to "+item+" it'll give me a "+str(int(rpg*10))+" in 10 chance of succeeding. ")
-					else:
-						printmsg("If I'm trying to "+state+", what if In order to "+goal+", I tried to "+item+". That has about a "+str(int(rpg*10))+" in 10 chance of working. ")
-					found=True
+				if("probability" in world[state][item] and item not in ["descr", "success_descr", "failure_descr"]):
+					rpg=rankPathByGoal(item, goal, ttl+1)*world[state][item]["probability"]
+					ranking+=rpg
+					if(int(rpg*10)>0):
+						if(found):
+							printmsg("On the other hand, if I try to "+item+" it'll give me a "+str(int(rpg*10))+" in 10 chance of succeeding. ")
+						else:
+							printmsg("If I'm trying to "+state+", what if In order to "+goal+", I tried to "+item+". That has about a "+str(int(rpg*10))+" in 10 chance of working. ")
+						found=True
 		if(len(world[state])>0):
 			ranking=ranking/len(world[state])
 	if(goal in goalPool and int(ranking*10)>0):
@@ -146,11 +162,12 @@ def rankPathByGoalPool(state):
 	compositeProb={}
 	if(state in world):
 		for item in world[state]:
-			compositeProb[item]=0
-			for goal in goalPool:
-				gr=rankPathByGoal(item, goal)*goalPool[goal]
-				#printmsg("GoalPool rank for path "+state+" to goal "+goal+" is ",gr)
-				compositeProb[item]+=gr
+			if(item not in ["descr", "success_descr", "failure_descr"]):
+				compositeProb[item]=0
+				for goal in goalPool:
+					gr=rankPathByGoal(item, goal)*goalPool[goal]
+					#printmsg("GoalPool rank for path "+state+" to goal "+goal+" is ",gr)
+					compositeProb[item]+=gr
 	return compositeProb
 
 def chooseGoal(state):
@@ -174,6 +191,8 @@ def scenes(state):
 			printmsg("\n\nThere's nothing left for me to do. I give up on trying to "+endGoal+".\n\n")
 			break
 		printmsg("\n\nSo, since I'm trying to "+state+" I decided to "+endGoal+" by trying to "+goal+". ")
+		if("descr" in world[goal]):
+			printmsg(random.choice(world[goal]["descr"]))
 		if(scene(state, goal)):
 			stateStack.append(state)
 			state=goal
