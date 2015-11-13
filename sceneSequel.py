@@ -11,16 +11,20 @@ successWeight=0.1
 complicationWeight=0.7
 
 world={}
-world["go about it the obvious way"]={"get a museum uniform":{"probability":0.5, "complications":{"get a smaller gun": { "probability":0.9 }}}}
+world["go about it the obvious way"]={"get a museum uniform":{"probability":0.5, "complications":{"get a smaller gun": { "probability":0.9 }}}, "go to the ninja supply store":{"probability":1}}
 world["go_to_gun_store"]={"get a smaller gun":{"probability":0.7, "complications":{"find my stolen wallet":{ "probability":0.2}}, "descr":["The gun store was a tiny brick building by the side of the highway, in the bad part of town. "], "success_descr":["The owner glared at me, and then at my ID, and then back at me. Then he grunted, accepted my cash, and handed me the new gun. "], "failure_descr":["After banging on the locked door for ten minutes, I noticed a tiny sign at the lower left hand corner of the window embedded in the door. It had hours. It turns out, this store is closed on Tuesdays. "]}}
 world["get a smaller gun"]={}
 world["get a museum uniform"]={"pass as a museum employee":{"probability":0.3, "complications":{"heal my leg wound":{ "probability":0.2}, "escape the museum":{ "probability": 0.7} } }, "descr":["The costume shop was tucked into a strip mall down town, between a laundromat and a chinese take-out place. It smelled like soap. "], "success_descr":["There was a perfect museum employee uniform sitting on the rack to the left of the entrance. "], "failure_descr":["After looking through the racks several times, I finally decided to ask the cashier -- a wrinkled but plump old woman with a puff of curly white hair -- if she carried museum employee uniforms. She shook her head, and I left, dejected. "]}
 world["pass as a museum employee"]={"steal them jewels":{"probability":0.7, "complications":{"heal my leg wound":{ "probability":0.3}, "heal my arm wound":{ "probability":0.3}, "heal my chest wound":{ "probability":0.3}}}, "go to the hospital":{"probability":0.9}}
+world["go to the ninja supply store"]={"purchase a black leather catsuit":{"probability":0.7, "success_descr":["A beautiful black leather catsuit greeted me from the rack to the left of the doorway. "], "failure_descr":["All the black leather catsuits they had in stock were sized for literal cats. ", "All the black leather cat suits they had in stock were way too big for me. ", "All their black leather catsuits were covered in shiny chrome studs and buckles, and wouldn't help me disappear into the night at all. "]}, "purchase a grappling hook":{"probability":0.7, "success_descr":["There was a grappling hook with two hundred feet of rope sitting right behind the counter, on display. ", "I spent twenty minutes looking through the discount bin, before finding an absolutely perfect grappling hook for thirty cents. When I went up to pay for it, the cashier waved me off -- no charge. "],"failure_descr":["\"Are there any grappling hooks in stock?\" The cashier, impassive behind his mask, shook his head slowly in response to my question. Then, after a moment of staring at me, he threw a smoke bomb at his feet. I found myself outside the shop, which was now locked. "]}, "descr":["The ninja supply shop was in the middle of the second floor of the mall, between a Hot Topic and a Zappo's. It was dimly lit, and the scuffed floors had a fake tatami-pattern print. There was a wad of gum stuck to the doorway. "], "failure_descr":["The shutter was shut, and a great big lock hung from the side of it. ", "The door was shut and locked, and a sign said \"Back at 2:00\". It was four. I waited until six. "]}
+world["purchase a black leather catsuit"]={"sneak into the museum at night":{"probability":0.8}, "go to the ninja supply store":{"probability":1}}
+world["purchase a grappling hook"]={"sneak into the museum at night":{"probability":0.9}, "go to the ninja supply store":{"probability":1}}
+world["sneak into the museum at night"]={"steal them jewels":{"probability":0.8, "complications":{"heal my leg wound":{"probability":0.3},"heal my arm wound":{ "probability":0.3}, "heal my chest wound":{ "probability":0.3}}}, "go to the hospital":{"probability":0.9}}
 world["go to the hospital"]={"heal my leg wound":{"probability":0.9}, "heal my arm wound":{"probability":0.9}, "heal my chest wound":{"probability":0.7}, "escape the museum":{"probability":0.7}}
-world["heal my leg wound"]={"go to the hospital":{"probability":1}, "get a museum uniform":{"probability":1}, "get a smaller gun":{"probability":1}}
-world["heal my arm wound"]={"go to the hospital":{"probability":1}, "get a museum uniform":{"probability":1}, "get a smaller gun":{"probability":1}}
-world["heal my chest wound"]={"go to the hospital":{"probability":1}, "get a museum uniform":{"probability":1}, "get a smaller gun":{"probability":1}}
-world["steal them jewels"]={"steal them jewels":{"probability":1, "complicaitons":{}}}
+world["heal my leg wound"]={"go to the hospital":{"probability":1}, "get a museum uniform":{"probability":1}, "get a smaller gun":{"probability":1}, "go to the ninja supply store":{"probability":1}}
+world["heal my arm wound"]={"go to the hospital":{"probability":1}, "get a museum uniform":{"probability":1}, "get a smaller gun":{"probability":1}, "go to the ninja supply store":{"probability":1}}
+world["heal my chest wound"]={"go to the hospital":{"probability":1}, "get a museum uniform":{"probability":1}, "get a smaller gun":{"probability":1}, "go to the ninja supply store":{"probability":1}}
+world["steal them jewels"]={"steal them jewels":{"probability":1, "complications":{}}}
 
 endGoal="steal them jewels"
 
@@ -52,13 +56,13 @@ def scene(state, goal):
 		if(goal in world[state]):
 			#printmsg("SCENE")
 			#printmsg("Goal: "+goal)
-			printmsg("So, I have to "+goal+". ")
+			#printmsg("So, I have to "+goal+". ")
 			#printmsg("Goalpool: ", goalPool)
 			for item in goalPool:
 				if(item!=goal):
 					printmsg("I also have to "+item+". ")
 			#printmsg("State: "+state)
-			printmsg("Right now, I'm trying to "+state+". ")
+			#printmsg("Right now, I'm trying to "+state+". ")
 			if("descr" in world[state][goal]):
 				printmsg(random.choice(world[state][goal]["descr"]))
 			res=biasedFlip((world[state][goal]["probability"]+successWeight)/2)
@@ -68,7 +72,8 @@ def scene(state, goal):
 					printmsg(random.choice(world[state][goal]["success_descr"]))
 				elif("success_descr" in world[goal]):
 					printmsg(random.choice(world[goal]["success_descr"]))
-				printmsg("\n\nI totally succeeded in my attempt to "+goal+" by trying to "+state+". Yay! ")
+				else:
+					printmsg("\n\nI totally succeeded in my attempt to "+goal+" by trying to "+state+". Yay! ")
 				if(goal in goalPool):
 					printmsg("Now I no longer need to "+goal+". ")
 					goalPool.pop(goal)
@@ -77,7 +82,8 @@ def scene(state, goal):
 					printmsg(random.choice(world[state][goal]["failure_descr"]))
 				elif("failure_descr" in world[goal]):
 					printmsg(random.choice(world[goal]["failure_descr"]))
-				printmsg("\n\nI failed to "+goal+" while trying to "+state+". Bummer. ")
+				else:
+					printmsg("\n\nI failed to "+goal+" while trying to "+state+". Bummer. ")
 				#printmsg("Result: failure")
 			comp=[]
 			if("complications" in world[state][goal]):
@@ -145,7 +151,7 @@ def rankPathByGoal(state, goal, ttl=0):
 						if(found):
 							printmsg("On the other hand, if I try to "+item+" it'll give me a "+str(int(rpg*10))+" in 10 chance of succeeding. ")
 						else:
-							printmsg("If I'm trying to "+state+", what if In order to "+goal+", I tried to "+item+". That has about a "+str(int(rpg*10))+" in 10 chance of working. ")
+							printmsg("If I'm trying to "+state+", what if in order to "+goal+", I tried to "+item+". That has about a "+str(int(rpg*10))+" in 10 chance of working. ")
 						found=True
 		if(len(world[state])>0):
 			ranking=ranking/len(world[state])
@@ -190,7 +196,7 @@ def scenes(state):
 		if(goal==None):
 			printmsg("\n\nThere's nothing left for me to do. I give up on trying to "+endGoal+".\n\n")
 			break
-		printmsg("\n\nSo, since I'm trying to "+state+" I decided to "+endGoal+" by trying to "+goal+". ")
+		#printmsg("\n\nSo, since I'm trying to "+state+" I decided to "+endGoal+" by trying to "+goal+". ")
 		if("descr" in world[goal]):
 			printmsg(random.choice(world[goal]["descr"]))
 		if(scene(state, goal)):
