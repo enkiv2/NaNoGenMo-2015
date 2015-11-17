@@ -1,0 +1,7 @@
+pitch:=$pname\, a $protag on $location\, discovers $premise.
+pname:=$fname $lname
+fname:=Rob,Bob,Will,Bill,Phil,Horselover,Jack,John,Jay,Palmer,Roy
+lname:=Arctor,Dick,Eldrich,Fat,Baty,Deckard
+protag:={narc,bounty hunter,mercenary,private dectective},{jewelry,melotron,{color,scent,emotion} {organ,clavier,harpsichord},space LSD,ceramic,pot,crap,water} {{sales,repair }man,artist,merchant,mechanic,artisan,miner}
+location:={,occupied }{California,Oregon,Orange County,Los Angeles,San Francisco,Mars,Io,Proxma 3}{, in the year {2,3}{0,1,2,3,4,5,6,7,8,9}{0,1,2,3,4,5,6,7,8,9}{0,1,2,3,4,5,6,7,8,9}}
+premise:={he {is {a{ {narc,robot,spy,secret agent,revolutionary}},n {android},space jesus{,'s father},the chosen one,in a simulation,dead all along,being sued by his {flat,robot taxi,washing machine,ersatz goat},in love with the creator of robot Abraham Lincoln,the president},hates his wife},the axis {won,didn't win} the war,{space {jesus,LSD},God} {is {a {robot,comsat,radio station,fungus,pink laser,memetic entity,giant amphibious german-speaking blob who likes ceramics,time machine,sexy folk singer,cyborg diplomat},his {son,flowerpot,former employer,ex-wife,robot taxi driver,washing machine}},wants {to have his babies,him to {fix some pottery,overthrow the government,put subliminal messages on the radio,make robot Abraham Lincoln,smuggle {Space ,}{God,Jesus} {onto an earth-bound transit vessel,through customs}}}}}
